@@ -2,6 +2,7 @@ module Nutrinfo
 using Reexport
 @reexport using IntervalArithmetic
 @reexport using Unitful
+@reexport using JSON
 # @reexport using DataStructures
 
 function scale(ratio::Real,ingredient::Dict{String,Any})::Dict{String,Any}
@@ -31,6 +32,12 @@ function combine(log::Array{Dict{String,Any},1})::Dict{String,Any}
     return reduce(mix,log);
 end
 export combine
+
+# remove from the log any entry any of whose keys contains a '#'
+function stripComments(log::Array{Dict{String,Any},1})::Array{Dict{String,Any},1}
+    return filter(x->!contains(join(collect(keys(x))),"#"),log);
+end
+export stripComments
 
 function Base.isapprox(l::Dict{String,Any}, r::Dict{String,Any})
     l === r && return true

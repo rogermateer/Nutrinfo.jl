@@ -16,68 +16,76 @@ end
     @test uconvert(u"kJ",1u"kcal") == 4.184u"kJ"
 end
 
+# Source: random myfitnesspal entries. Note: there is wild
+# inaccuracy/variability in its crowd-sourced nutritional information
+# - often due to lazy recording of serving sizes
+
+FuerteAvocado100g = Dict{String,Any}(
+    "Serving" => 100u"g",
+    "Energy" => 160u"kcal",
+    "Protein" => 2u"g",
+    "Carbohydrates" => (26/3)u"g",
+    "Fat" => (44/3)u"g"
+)
+FuerteAvocado = Dict{String,Any}(
+    "Serving" => 150u"g",
+    "Energy" => 240u"kcal",
+    "Protein" => 3u"g",
+    "Carbohydrates" => 13u"g",
+    "Fat" => 22u"g"
+)
+
+Egg100g = Dict{String,Any}(
+    "Serving" => 100u"g",
+    "Energy" => 143u"kcal",
+    "Protein" => 13u"g",
+    "Carbohydrates" => 1u"g",
+    "Fat" => 10u"g"
+)
+EggLarge = qty(50u"g",Egg100g)
+
+SaskoLowGiBrownBread100g = Dict{String,Any}(
+    "Serving" => 100u"g",
+    "Energy" => 223u"kcal",
+    "Protein" => 9u"g",
+    "Carbohydrates" => 38u"g",
+    "Fat" => 1u"g"
+)
+SaskoLowGiBrownBreadSlice = qty(55u"g",SaskoLowGiBrownBread100g)
+
+BreakfastActual = [
+    FuerteAvocado,
+    scale(3,EggLarge),
+    scale(2,SaskoLowGiBrownBreadSlice),
+]
+BreakfastExpected = Dict{String,Any}(
+    "Serving" => FuerteAvocado["Serving"] + 3*EggLarge["Serving"] + 2*SaskoLowGiBrownBreadSlice["Serving"],
+    "Energy" => FuerteAvocado["Energy"] + 3*EggLarge["Energy"] + 2*SaskoLowGiBrownBreadSlice["Energy"],
+    "Protein" => FuerteAvocado["Protein"] + 3*EggLarge["Protein"] + 2*SaskoLowGiBrownBreadSlice["Protein"],
+    "Carbohydrates" => FuerteAvocado["Carbohydrates"] + 3*EggLarge["Carbohydrates"] + 2*SaskoLowGiBrownBreadSlice["Carbohydrates"],
+    "Fat" => FuerteAvocado["Fat"] + 3*EggLarge["Fat"] + 2*SaskoLowGiBrownBreadSlice["Fat"]
+)
+day20210310 = [
+    BreakfastActual...,
+]
+
 @testset "Prototype Food Log" begin
-    # Source: random myfitnesspal entries. Note: there is wild
-    # inaccuracy/variability in its crowd-sourced nutritional
-    # information - often due to lazy recording of serving sizes
-
-    FuerteAvocado100g = Dict{String,Any}(
-        "Serving" => 100u"g",
-        "Energy" => 160u"kcal",
-        "Protein" => 2u"g",
-        "Carbohydrates" => (26/3)u"g",
-        "Fat" => (44/3)u"g"
-    )
-    FuerteAvocado = Dict{String,Any}(
-        "Serving" => 150u"g",
-        "Energy" => 240u"kcal",
-        "Protein" => 3u"g",
-        "Carbohydrates" => 13u"g",
-        "Fat" => 22u"g"
-    )
-
     @test qty(100u"g",FuerteAvocado)==FuerteAvocado100g
-    
-    Egg100g = Dict{String,Any}(
-        "Serving" => 100u"g",
-        "Energy" => 143u"kcal",
-        "Protein" => 13u"g",
-        "Carbohydrates" => 1u"g",
-        "Fat" => 10u"g"
-    )
-    EggLarge = qty(50u"g",Egg100g)
+    @test combine(day20210310)["Serving"]==BreakfastExpected["Serving"]
+    @test combine(day20210310)["Energy"]==BreakfastExpected["Energy"]
+    @test combine(day20210310)["Protein"]==BreakfastExpected["Protein"]
+    @test combine(day20210310)["Carbohydrates"]==BreakfastExpected["Carbohydrates"]
+    @test combine(day20210310)["Fat"]==BreakfastExpected["Fat"]
+    @test combine(day20210310) ≈ BreakfastExpected
+end
 
-    SaskoLowGiBrownBread100g = Dict{String,Any}(
-        "Serving" => 100u"g",
-        "Energy" => 223u"kcal",
-        "Protein" => 9u"g",
-        "Carbohydrates" => 38u"g",
-        "Fat" => 1u"g"
-    )
-    SaskoLowGiBrownBreadSlice = qty(55u"g",SaskoLowGiBrownBread100g)
-
-    BreakfastActual = [
-        FuerteAvocado,
-        scale(3,EggLarge),
-        scale(2,SaskoLowGiBrownBreadSlice),
-    ]
-    BreakfastExpected = Dict{String,Any}(
-        "Serving" => FuerteAvocado["Serving"] + 3*EggLarge["Serving"] + 2*SaskoLowGiBrownBreadSlice["Serving"],
-        "Energy" => FuerteAvocado["Energy"] + 3*EggLarge["Energy"] + 2*SaskoLowGiBrownBreadSlice["Energy"],
-        "Protein" => FuerteAvocado["Protein"] + 3*EggLarge["Protein"] + 2*SaskoLowGiBrownBreadSlice["Protein"],
-        "Carbohydrates" => FuerteAvocado["Carbohydrates"] + 3*EggLarge["Carbohydrates"] + 2*SaskoLowGiBrownBreadSlice["Carbohydrates"],
-        "Fat" => FuerteAvocado["Fat"] + 3*EggLarge["Fat"] + 2*SaskoLowGiBrownBreadSlice["Fat"]
-    )
-    Day = [
-        BreakfastActual...,
-    ]
-
-    @test combine(Day)["Serving"]==BreakfastExpected["Serving"]
-    @test combine(Day)["Energy"]==BreakfastExpected["Energy"]
-    @test combine(Day)["Protein"]==BreakfastExpected["Protein"]
-    @test combine(Day)["Carbohydrates"]==BreakfastExpected["Carbohydrates"]
-    @test combine(Day)["Fat"]==BreakfastExpected["Fat"]
-
-    @test combine(Day) ≈ BreakfastExpected
+@testset "JSON" begin
+    log = JSON.parsefile("../data/log.json")
+    nutrients = JSON.parsefile("../data/nutrients.json")
+    barelog20210310 = stripComments(Array{Dict{String,Any},1}(log["<2021-03-10 Wed>"]))    
+    @test length(barelog20210310) == length(BreakfastActual)
+    @test barelog20210310[1] == BreakfastActual[1]
+    @test barelog20210310[2] == BreakfastActual[2]
+    @test barelog20210310[3] == BreakfastActual[3]
 
 end
