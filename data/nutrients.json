@@ -1,3 +1,39 @@
 {
-  meta: "Test Nutrients Database"
+  "#" : "Test Nutrients Database",
+  "FuerteAvocado100g" : {
+    "Serving" : "100g",
+    "Energy" : "160kcal",
+    "Protein" : "2g",
+    "Carbohydrates" : "(26/3)g",
+    "Fat" : "(44/3)g"
+  },
+  "FuerteAvocado" : {
+    "Serving" : "150g",
+    "Energy" : "240kcal",
+    "Protein" : "3g",
+    "Carbohydrates" : "13g",
+    "Fat" : "22g"
+  },
+  "Egg100g" : {
+    "Serving" : "100g",
+    "Energy" : "143kcal",
+    "Protein" : "13g",
+    "Carbohydrates" : "1g",
+    "Fat" : "10g"
+  },
+  "EggLarge" : {
+    "qty" : "50g",
+    "of" : "Egg100g"
+  },
+  "SaskoLowGiBrownBread100g" : {
+    "Serving" : "100g",
+    "Energy" : "223kcal",
+    "Protein" : "9g",
+    "Carbohydrates" : "38g",
+    "Fat" : "1g"
+  },
+  "SaskoLowGiBrownBreadSlice" : {
+    "qty" : "55g",
+    "of" : "SaskoLowGiBrownBread100g"
+  }
 }
