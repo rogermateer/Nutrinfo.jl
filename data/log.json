@@ -2,6 +2,15 @@
   "#" : "Test Log",
   "<2021-03-10 Wed>" : [
     { "#" : "08:00" },
+    { "#" : "example with standard units" },
+    { "qty" : "150g", "of" : "FuerteAvocado" },
+    { "qty" : "3*50g", "of" : "Egg100g" },
+    { "qty" : "2*55g", "of" : "SaskoLowGiBrownBread100g" },
+    { "#" : "end" }
+  ],
+  "<2021-03-11 Thu>" : [
+    { "#" : "08:00" },
+    { "#" : "example with custom units" },
     { "qty" : "unit", "of" : "FuerteAvocado" },
     { "qty" : "3unit", "of" : "EggLarge" },
     { "qty" : "2slice", "of" : "SaskoLowGiBrownBread" },
