@@ -79,13 +79,27 @@ day20210310 = [
     @test combine(day20210310) ≈ BreakfastExpected
 end
 
+@testset "Unit parsing" begin
+    @test parseUnit("1kcal")==u"4.184kJ"
+    @test parseUnit("1g")==u"1000mg"
+    @test parseUnit("1000mg")==u"1g"
+end
+
 @testset "JSON" begin
     log = JSON.parsefile("../data/log.json")
     nutrients = JSON.parsefile("../data/nutrients.json")
-    barelog20210310 = stripComments(Array{Dict{String,Any},1}(log["<2021-03-10 Wed>"]))    
+    barelog20210310 = stripComments(Array{Dict{String,Any},1}(log["<2021-03-10 Wed>"]))
     @test length(barelog20210310) == length(BreakfastActual)
-    @test barelog20210310[1] == BreakfastActual[1]
-    @test barelog20210310[2] == BreakfastActual[2]
-    @test barelog20210310[3] == BreakfastActual[3]
+    @test parseUnits(nutrients[barelog20210310[1]["of"]]) == BreakfastActual[1]
+
+    @test qty(parseUnit(barelog20210310[1]["qty"]),parseUnits(nutrients[barelog20210310[1]["of"]])) == BreakfastActual[1]
+    @test qty(parseUnit(barelog20210310[2]["qty"]),parseUnits(nutrients[barelog20210310[2]["of"]])) == BreakfastActual[2]
+    @test qty(parseUnit(barelog20210310[3]["qty"]),parseUnits(nutrients[barelog20210310[3]["of"]])) == BreakfastActual[3]
+
+    @test parseIngredient(barelog20210310[1],nutrients) == BreakfastActual[1]
+    @test parseIngredient(barelog20210310[2],nutrients) == BreakfastActual[2]
+    @test parseIngredient(barelog20210310[3],nutrients) == BreakfastActual[3]
+
+    @test parseIngredients(barelog20210310,nutrients) ≈ combine(BreakfastActual)
 
 end

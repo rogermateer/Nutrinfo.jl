@@ -50,5 +50,25 @@ function Base.isapprox(l::Dict{String,Any}, r::Dict{String,Any})
     true
 end
 
+function parseUnit(x)
+    return eval(quote @u_str($x) end)
+end
+export parseUnit
+
+function parseUnits(ingredient::Dict{String,Any})::Dict{String,Any}
+    return Dict( key=>parseUnit(value) for (key,value) in ingredient);
+end
+export parseUnits
+
+function parseIngredient(ingredient::Dict{String,Any},nutrientsDatabase::Dict{String,Any})::Dict{String,Any}
+    return qty(parseUnit(ingredient["qty"]),parseUnits(nutrientsDatabase[ingredient["of"]]));
+end
+export parseIngredient
+
+function parseIngredients(log::Array{Dict{String,Any},1},nutrientsDatabase::Dict{String,Any})::Dict{String,Any}
+    return combine(map(x->parseIngredient(x,nutrientsDatabase),log));
+end
+export parseIngredients
+
 end # module
 
