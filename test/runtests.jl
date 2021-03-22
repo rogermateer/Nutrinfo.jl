@@ -13,7 +13,6 @@ using Nutrinfo
     @test             uconvert(u"μg",Interval(0,1)u"μg" + 1u"mg")  != Interval(1000,1001)u"μg"
 end
 
-
 @testset ExtendedTestSet "Custom Units" begin
     @test uconvert(u"kJ",1u"kcal") == 4.184u"kJ"
 end
@@ -87,47 +86,33 @@ end
     @test parseUnit("1000mg")==u"1g"
 end
 
-@testset ExtendedTestSet "JSON comment stripping" begin
-    log = JSON.parsefile("../data/log.json")
-    strippedLog = JSON.parsefile("../data/log.nocomments.json");
-    #@test log == stripCommentsFromLog(log)
-    @test stripCommentsFromLog(log) == strippedLog
+@testset ExtendedTestSet "JSON comment stripping and digesting" begin
+    logWithComments = JSON.parsefile("../data/log.json")
+    log = JSON.parsefile("../data/log.nocomments.json");
+    #@test logWithComments == stripCommentsFromLog(logWithComments)
+    @test stripCommentsFromLog(logWithComments) == log
 
-    nutrients = JSON.parsefile("../data/nutrients.json")
-    strippedNutrients = JSON.parsefile("../data/nutrients.nocomments.json");
-    #@test nutrients == stripCommentsFromNutrients(nutrients)
-    @test stripCommentsFromNutrients(nutrients) == strippedNutrients
-end
-
-#=
-    #typedlog = Dict{String,Union{String,Array{Any,1}}}(log);
-    #print(Dict{String,Union{String,Array{Dict{String,String},1}}}(log))
-    print("""
-
-LOG
-""")
-    print(log)
-    print("""
-
-STRIPPEDLOG
-""")
-    print(strippedLog)
+    nutrientsWithComments = JSON.parsefile("../data/nutrients.json")
+    nutrients = JSON.parsefile("../data/nutrients.nocomments.json");
+    #@test nutrientsWithComments == stripCommentsFromNutrients(nutrientsWithComments)
+    @test stripCommentsFromNutrients(nutrientsWithComments) == nutrients
 
     log20210310 = log["<2021-03-10 Wed>"]
     print(log20210310)
-    barelog20210310 = stripCommentsFromArrayOfDict(Array{Dict{String,Any},1}(log20210310))
-    @test length(barelog20210310) == length(BreakfastActual)
 
-    nutrients = JSON.parsefile("../data/nutrients.json")
-    @test parseUnits(nutrients[barelog20210310[1]["of"]]) == BreakfastActual[1]
+    @test length(log20210310) == length(BreakfastActual)
 
-    @test qty(parseUnit(barelog20210310[1]["qty"]),parseUnits(nutrients[barelog20210310[1]["of"]])) == BreakfastActual[1]
-    @test qty(parseUnit(barelog20210310[2]["qty"]),parseUnits(nutrients[barelog20210310[2]["of"]])) == BreakfastActual[2]
-    @test qty(parseUnit(barelog20210310[3]["qty"]),parseUnits(nutrients[barelog20210310[3]["of"]])) == BreakfastActual[3]
+    @test parseUnits(Ingredient(nutrients[log20210310[1]["of"]])) == BreakfastActual[1]
 
-    @test parseIngredient(barelog20210310[1],nutrients) == BreakfastActual[1]
-    @test parseIngredient(barelog20210310[2],nutrients) == BreakfastActual[2]
-    @test parseIngredient(barelog20210310[3],nutrients) == BreakfastActual[3]
+    @test qty(parseUnit(log20210310[1]["qty"]),parseUnits(Ingredient(nutrients[log20210310[1]["of"]]))) == BreakfastActual[1]
+    @test qty(parseUnit(log20210310[2]["qty"]),parseUnits(Ingredient(nutrients[log20210310[2]["of"]]))) == BreakfastActual[2]
+    @test qty(parseUnit(log20210310[3]["qty"]),parseUnits(Ingredient(nutrients[log20210310[3]["of"]]))) == BreakfastActual[3]
 
-    @test parseIngredients(barelog20210310,nutrients) ≈ combine(BreakfastActual)
-=#
+    @test parseIngredient(Ingredient(log20210310[1]),Nutrients(nutrients)) == BreakfastActual[1]
+    @test parseIngredient(Ingredient(log20210310[2]),Nutrients(nutrients)) == BreakfastActual[2]
+    @test parseIngredient(Ingredient(log20210310[3]),Nutrients(nutrients)) == BreakfastActual[3]
+
+    @test parseIngredients(Array{Ingredient,1}(log20210310),Nutrients(nutrients)) ≈ combine(BreakfastActual)
+
+
+end

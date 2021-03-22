@@ -44,23 +44,26 @@ function stripCommentsFromArrayOfDict(array::Array{Dict{String,Any},1})::Array{D
 end
 export stripCommentsFromArrayOfDict
 
-const Log = Dict{String,Union{String,Array{Dict{String,Any},1}}}
-const StrippedLog = Dict{String,Array{Dict{String,Any},1}}
+const Ingredient = Dict{String,String}                              ; export Ingredient
+const CommentedLog = Dict{String,Union{String,Array{Ingredient,1}}}
+const Log = Dict{String,Array{Ingredient,1}}                        ; export Log
+const CommentedNutrients = Dict{String,Union{String,Ingredient}}
+const Nutrients = Dict{String,Ingredient}                           ; export Nutrients
 
 # Remove comments from the supplied log. This entails removing
 # key-value pairs both where keys contain a "#" and where
 # Array{Dict{String,Any},1} values (log entries) have any key
 # containing a "#"
-function stripCommentsFromLog(log#=::Log=#)::StrippedLog
+function stripCommentsFromLog(log#=::CommentedLog=#)::Log
     strippedLog = stripCommentsFromDict(log);
     return Dict( key=>stripCommentsFromArrayOfDict(Array{Dict{String,Any},1}(value)) for (key,value) in strippedLog );
 end
 export stripCommentsFromLog
 
-const Nutrients = Dict{String,Union{String,Dict{String,Any}}}
-const StrippedNutrients = Dict{String,Dict{String,Any}}
-
-function stripCommentsFromNutrients(nutrients#=::Nutrients=#)::StrippedNutrients
+# Remove comments from the supplied nutrients database. This entails
+# removing both top and second level key-value pairs with keys that
+# contain a "#"
+function stripCommentsFromNutrients(nutrients#=::CommentedNutrients=#)::Nutrients
     strippedNutrients = stripCommentsFromDict(nutrients);
     return Dict( key=>stripCommentsFromDict(value) for (key,value) in strippedNutrients );
 end
@@ -82,18 +85,18 @@ function parseUnit(x)
 end
 export parseUnit
 
-function parseUnits(ingredient::Dict{String,Any})::Dict{String,Any}
+function parseUnits(ingredient::Ingredient)::Dict{String,Any}
     return Dict( key=>parseUnit(value) for (key,value) in ingredient);
 end
 export parseUnits
 
-function parseIngredient(ingredient::Dict{String,Any},nutrientsDatabase::Dict{String,Any})::Dict{String,Any}
+function parseIngredient(ingredient::Ingredient,nutrientsDatabase::Nutrients)::Dict{String,Any}
     return qty(parseUnit(ingredient["qty"]),parseUnits(nutrientsDatabase[ingredient["of"]]));
 end
 export parseIngredient
 
-function parseIngredients(log::Array{Dict{String,Any},1},nutrientsDatabase::Dict{String,Any})::Dict{String,Any}
-    return combine(map(x->parseIngredient(x,nutrientsDatabase),log));
+function parseIngredients(ingredients::Array{Ingredient,1},nutrientsDatabase::Nutrients)::Dict{String,Any}
+    return combine(map(x->parseIngredient(x,nutrientsDatabase),ingredients));
 end
 export parseIngredients
 
