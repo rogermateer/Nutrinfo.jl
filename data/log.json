@@ -1,5 +1,5 @@
 {
-  "#" : "Test Log",
+  "##" : "Test Log",
   "<2021-03-10 Wed>" : [
     { "#" : "08:00" },
     { "#" : "example with standard units" },

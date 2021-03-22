@@ -1,9 +1,10 @@
 using Nutrinfo
 using Test
+using TestSetExtensions
 
 using Nutrinfo
 
-@testset "Unitful Intervals - the bread and butter of nutritional information calculations" begin
+@testset ExtendedTestSet "Unitful Intervals - the bread and butter of nutritional information calculations" begin
     @test Interval(0,1)u"μg" + 1u"μg" == Interval(1,2)u"μg"
     @test                            Interval(0,1)u"μg" + 1u"mg"   != Interval(1,1.001)u"mg"
     @test round(u"μg",uconvert(u"μg",Interval(0,1)u"μg" + 1u"mg")) != Interval(1000,1001)u"mg"
@@ -12,7 +13,8 @@ using Nutrinfo
     @test             uconvert(u"μg",Interval(0,1)u"μg" + 1u"mg")  != Interval(1000,1001)u"μg"
 end
 
-@testset "Custom Units" begin
+
+@testset ExtendedTestSet "Custom Units" begin
     @test uconvert(u"kJ",1u"kcal") == 4.184u"kJ"
 end
 
@@ -69,7 +71,7 @@ day20210310 = [
     BreakfastActual...,
 ]
 
-@testset "Prototype Food Log" begin
+@testset ExtendedTestSet "Prototype Food Log" begin
     @test qty(100u"g",FuerteAvocado)==FuerteAvocado100g
     @test combine(day20210310)["Serving"]==BreakfastExpected["Serving"]
     @test combine(day20210310)["Energy"]==BreakfastExpected["Energy"]
@@ -79,17 +81,44 @@ day20210310 = [
     @test combine(day20210310) ≈ BreakfastExpected
 end
 
-@testset "Unit parsing" begin
+@testset ExtendedTestSet "Unit parsing" begin
     @test parseUnit("1kcal")==u"4.184kJ"
     @test parseUnit("1g")==u"1000mg"
     @test parseUnit("1000mg")==u"1g"
 end
 
-@testset "JSON" begin
+@testset ExtendedTestSet "JSON comment stripping" begin
     log = JSON.parsefile("../data/log.json")
+    strippedLog = JSON.parsefile("../data/log.nocomments.json");
+    #@test log == stripCommentsFromLog(log)
+    @test stripCommentsFromLog(log) == strippedLog
+
     nutrients = JSON.parsefile("../data/nutrients.json")
-    barelog20210310 = stripComments(Array{Dict{String,Any},1}(log["<2021-03-10 Wed>"]))
+    strippedNutrients = JSON.parsefile("../data/nutrients.nocomments.json");
+    #@test nutrients == stripCommentsFromNutrients(nutrients)
+    @test stripCommentsFromNutrients(nutrients) == strippedNutrients
+end
+
+#=
+    #typedlog = Dict{String,Union{String,Array{Any,1}}}(log);
+    #print(Dict{String,Union{String,Array{Dict{String,String},1}}}(log))
+    print("""
+
+LOG
+""")
+    print(log)
+    print("""
+
+STRIPPEDLOG
+""")
+    print(strippedLog)
+
+    log20210310 = log["<2021-03-10 Wed>"]
+    print(log20210310)
+    barelog20210310 = stripCommentsFromArrayOfDict(Array{Dict{String,Any},1}(log20210310))
     @test length(barelog20210310) == length(BreakfastActual)
+
+    nutrients = JSON.parsefile("../data/nutrients.json")
     @test parseUnits(nutrients[barelog20210310[1]["of"]]) == BreakfastActual[1]
 
     @test qty(parseUnit(barelog20210310[1]["qty"]),parseUnits(nutrients[barelog20210310[1]["of"]])) == BreakfastActual[1]
@@ -101,5 +130,4 @@ end
     @test parseIngredient(barelog20210310[3],nutrients) == BreakfastActual[3]
 
     @test parseIngredients(barelog20210310,nutrients) ≈ combine(BreakfastActual)
-
-end
+=#

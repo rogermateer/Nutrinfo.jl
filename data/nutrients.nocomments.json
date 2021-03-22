@@ -1,5 +1,4 @@
 {
-  "#" : "Test Nutrients Database",
   "FuerteAvocado100g" : {
     "Serving" : "100g",
     "Energy" : "160kcal",
@@ -8,7 +7,6 @@
     "Fat" : "(44/3)g"
   },
   "FuerteAvocado" : {
-    "#source" : "MyFitnessPal",
     "Serving" : "150g",
     "Energy" : "240kcal",
     "Protein" : "3g",

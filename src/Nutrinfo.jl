@@ -33,11 +33,38 @@ function combine(log::Array{Dict{String,Any},1})::Dict{String,Any}
 end
 export combine
 
-# remove from the log any entry any of whose keys contains a '#'
-function stripComments(log::Array{Dict{String,Any},1})::Array{Dict{String,Any},1}
-    return filter(x->!contains(join(collect(keys(x))),"#"),log);
+# remove from Dict{String,Any} any entry whose key contains a '#'
+function stripCommentsFromDict(dict::Dict{String,Any})::Dict{String,Any}
+    return filter(p->!contains(first(p),"#"),dict);
 end
-export stripComments
+
+# remove from Array{Dict{String,Any},1} any entry any of whose keys contains a '#'
+function stripCommentsFromArrayOfDict(array::Array{Dict{String,Any},1})::Array{Dict{String,Any},1}
+    return filter(x->!contains(join(collect(keys(x))),"#"),array);
+end
+export stripCommentsFromArrayOfDict
+
+const Log = Dict{String,Union{String,Array{Dict{String,Any},1}}}
+const StrippedLog = Dict{String,Array{Dict{String,Any},1}}
+
+# Remove comments from the supplied log. This entails removing
+# key-value pairs both where keys contain a "#" and where
+# Array{Dict{String,Any},1} values (log entries) have any key
+# containing a "#"
+function stripCommentsFromLog(log#=::Log=#)::StrippedLog
+    strippedLog = stripCommentsFromDict(log);
+    return Dict( key=>stripCommentsFromArrayOfDict(Array{Dict{String,Any},1}(value)) for (key,value) in strippedLog );
+end
+export stripCommentsFromLog
+
+const Nutrients = Dict{String,Union{String,Dict{String,Any}}}
+const StrippedNutrients = Dict{String,Dict{String,Any}}
+
+function stripCommentsFromNutrients(nutrients#=::Nutrients=#)::StrippedNutrients
+    strippedNutrients = stripCommentsFromDict(nutrients);
+    return Dict( key=>stripCommentsFromDict(value) for (key,value) in strippedNutrients );
+end
+export stripCommentsFromNutrients
 
 function Base.isapprox(l::Dict{String,Any}, r::Dict{String,Any})
     l === r && return true
