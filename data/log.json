@@ -3,6 +3,7 @@
   "<2021-03-10 Wed>" : [
     { "#" : "08:00" },
     { "#" : "example with standard units" },
+    { "qty" : "500ml", "of" : "Water" },
     { "qty" : "150g", "of" : "FuerteAvocado" },
     { "qty" : "3*50g", "of" : "Egg100g" },
     { "qty" : "2*55g", "of" : "SaskoLowGiBrownBread100g" },

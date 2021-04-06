@@ -17,6 +17,11 @@ end
     @test uconvert(u"kJ",1u"kcal") == 4.184u"kJ"
 end
 
+Water = Dict{String,Any}(
+    "Serving" => 100u"ml",
+    "Water" => 100u"ml"
+)
+
 # Source: random myfitnesspal entries. Note: there is wild
 # inaccuracy/variability in its crowd-sourced nutritional information
 # - often due to lazy recording of serving sizes
@@ -55,12 +60,13 @@ SaskoLowGiBrownBread100g = Dict{String,Any}(
 SaskoLowGiBrownBreadSlice = qty(55u"g",SaskoLowGiBrownBread100g)
 
 BreakfastActual = [
+    scale(5,Water),
     FuerteAvocado,
     scale(3,EggLarge),
     scale(2,SaskoLowGiBrownBreadSlice),
 ]
 BreakfastExpected = Dict{String,Any}(
-    "Serving" => FuerteAvocado["Serving"] + 3*EggLarge["Serving"] + 2*SaskoLowGiBrownBreadSlice["Serving"],
+    "Water" => 5*Water["Water"],
     "Energy" => FuerteAvocado["Energy"] + 3*EggLarge["Energy"] + 2*SaskoLowGiBrownBreadSlice["Energy"],
     "Protein" => FuerteAvocado["Protein"] + 3*EggLarge["Protein"] + 2*SaskoLowGiBrownBreadSlice["Protein"],
     "Carbohydrates" => FuerteAvocado["Carbohydrates"] + 3*EggLarge["Carbohydrates"] + 2*SaskoLowGiBrownBreadSlice["Carbohydrates"],
@@ -72,7 +78,7 @@ day20210310 = [
 
 @testset ExtendedTestSet "Prototype Food Log" begin
     @test qty(100u"g",FuerteAvocado)==FuerteAvocado100g
-    @test combine(day20210310)["Serving"]==BreakfastExpected["Serving"]
+    @test combine(day20210310)["Water"]==BreakfastExpected["Water"]
     @test combine(day20210310)["Energy"]==BreakfastExpected["Energy"]
     @test combine(day20210310)["Protein"]==BreakfastExpected["Protein"]
     @test combine(day20210310)["Carbohydrates"]==BreakfastExpected["Carbohydrates"]
@@ -102,7 +108,7 @@ end
 
     @test length(log20210310) == length(BreakfastActual)
 
-    @test parseUnits(Ingredient(nutrients[log20210310[1]["of"]])) == BreakfastActual[1]
+    @test parseUnits(Ingredient(nutrients[log20210310[2]["of"]])) == BreakfastActual[2]
 
     @test qty(parseUnit(log20210310[1]["qty"]),parseUnits(Ingredient(nutrients[log20210310[1]["of"]]))) == BreakfastActual[1]
     @test qty(parseUnit(log20210310[2]["qty"]),parseUnits(Ingredient(nutrients[log20210310[2]["of"]]))) == BreakfastActual[2]
@@ -113,6 +119,4 @@ end
     @test parseIngredient(Ingredient(log20210310[3]),Nutrients(nutrients)) == BreakfastActual[3]
 
     @test parseIngredients(Array{Ingredient,1}(log20210310),Nutrients(nutrients)) ≈ combine(BreakfastActual)
-
-
 end

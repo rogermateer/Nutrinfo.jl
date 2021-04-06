@@ -1,5 +1,10 @@
 {
   "#" : "Test Nutrients Database",
+  "Water" : {
+    "#" : "Example of an entry with unusual components",
+    "Serving" : "100ml",
+    "Water" : "100ml"
+  },
   "FuerteAvocado100g" : {
     "Serving" : "100g",
     "Energy" : "160kcal",

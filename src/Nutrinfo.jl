@@ -23,9 +23,22 @@ function qty(serving::Any,ingredient::Dict{String,Any})::Dict{String,Any}
 end
 export qty;
 
+function add(key::String,ingredient1::Dict{String,Any},ingredient2::Dict{String,Any})::Any
+    if (key ∉ keys(ingredient1) && key ∉ keys(ingredient2))
+        return 0;
+    end
+    if (key ∉ keys(ingredient1))
+        return ingredient2[key]
+    end
+    if (key ∉ keys(ingredient2))
+        return ingredient1[key]
+    end
+    return ingredient1[key] + ingredient2[key];
+end
+
 function mix(ingredient1::Dict{String,Any},ingredient2::Dict{String,Any})::Dict{String,Any}
-    allkeys = union(keys(ingredient1),keys(ingredient2));
-    return Dict( key=>ingredient1[key]+ingredient2[key] for (key) in allkeys );
+    allkeys = setdiff(union(keys(ingredient1),keys(ingredient2)),["Serving"]);
+    return Dict( key=>add(key,ingredient1,ingredient2) for (key) in allkeys );
 end
 
 function combine(log::Array{Dict{String,Any},1})::Dict{String,Any}
