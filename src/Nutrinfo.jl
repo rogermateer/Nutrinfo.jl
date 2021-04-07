@@ -94,7 +94,14 @@ function Base.isapprox(l::Dict{String,Any}, r::Dict{String,Any})
 end
 
 function parseUnit(x)
-    return eval(quote @u_str($x) end)
+    try 
+        return eval(quote @u_str($x) end)
+    catch
+        m=match(r"([[][^]]+[]])(.+)",x);
+        i = m[1]
+        u = m[2]
+        return (@interval i)eval(quote @u_str($u) end)
+    end
 end
 export parseUnit
 
@@ -104,6 +111,10 @@ end
 export parseUnits
 
 function parseIngredient(ingredient::Ingredient,nutrientsDatabase::Nutrients)::Dict{String,Any}
+    # println(ingredient);
+    # println(parseUnit(ingredient["qty"]));
+    # println(nutrientsDatabase[ingredient["of"]]);
+    # println(parseUnits(nutrientsDatabase[ingredient["of"]]));
     return qty(parseUnit(ingredient["qty"]),parseUnits(nutrientsDatabase[ingredient["of"]]));
 end
 export parseIngredient

@@ -13,6 +13,11 @@ using Nutrinfo
     @test             uconvert(u"μg",Interval(0,1)u"μg" + 1u"mg")  != Interval(1000,1001)u"μg"
 end
 
+@testset ExtendedTestSet "Unitful Interval parsing - I'm open to correction, but apparently this doesn't 'just work' out of the box" begin
+    @test parseUnit("1μg") == 1u"μg"
+    @test parseUnit("[0,1]μg") == Interval(0,1)u"μg"
+end
+
 @testset ExtendedTestSet "Custom Units" begin
     @test uconvert(u"kJ",1u"kcal") == 4.184u"kJ"
 end
