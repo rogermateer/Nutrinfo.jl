@@ -1,45 +1,67 @@
-{
-  "#" : "Test Nutrients Database",
-  "Water" : {
-    "#" : "Example of an entry with unusual components",
-    "Serving" : "100ml",
-    "Water" : "100ml"
+[
+  {
+    "name" : "Test Nutrients Database",
+    "component" : []
   },
-  "FuerteAvocado100g" : {
-    "Serving" : "100g",
-    "Energy" : "160kcal",
-    "Protein" : "2g",
-    "Carbohydrates" : "(26/3)g",
-    "Fat" : "(44/3)g"
+  {
+    "name" : "Water",
+    "component" : [
+      { "#" : "Example of an entry with unusual components" },
+      { "qty" : "100ml", "of" : "Serving" },
+      { "qty" : "100ml", "of" : "Water" },
+      { "#" : "end" }
+    ]
   },
-  "FuerteAvocado" : {
-    "#source" : "MyFitnessPal",
-    "Serving" : "150g",
-    "Energy" : "240kcal",
-    "Protein" : "3g",
-    "Carbohydrates" : "13g",
-    "Fat" : "22g"
+  {
+    "name" : "FuerteAvocado",
+    "component" : [
+      { "#" : "Source: MyFitnessPal" },
+      { "qty" : "150g", "of" : "Serving" },
+      { "qty" : "240kcal", "of" : "Energy" },
+      { "qty" : "3g", "of" : "Protein" },
+      { "qty" : "13g", "of" : "Carbohydrates" },
+      { "qty" : "22g", "of" : "Fat" },
+      { "#" : "end" }
+    ]
   },
-  "Egg100g" : {
-    "Serving" : "100g",
-    "Energy" : "143kcal",
-    "Protein" : "13g",
-    "Carbohydrates" : "1g",
-    "Fat" : "10g"
+  {
+    "name" : "Egg",
+    "component" : [
+      { "qty" : "100g", "of" : "Serving" },
+      { "qty" : "143kcal", "of" : "Energy" },
+      { "qty" : "13g", "of" : "Protein" },
+      { "qty" : "1g", "of" : "Carbohydrates" },
+      { "qty" : "10g", "of" : "Fat" },
+      { "#" : "end" }
+    ]
   },
-  "EggLarge" : {
-    "qty" : "50g",
-    "of" : "Egg100g"
+  {
+    "name" : "EggLarge",
+    "component" : [
+      { "qty" : "50g", "of" : "Egg" }
+    ]
   },
-  "SaskoLowGiBrownBread100g" : {
-    "Serving" : "100g",
-    "Energy" : "223kcal",
-    "Protein" : "9g",
-    "Carbohydrates" : "38g",
-    "Fat" : "1g"
+  {
+    "name" : "SaskoLowGiBrownBread",
+    "component" : [
+      { "qty" : "100g", "of" : "Serving" },
+      { "qty" : "223kcal", "of" : "Energy" },
+      { "qty" : "9g", "of" : "Protein" },
+      { "qty" : "38g", "of" : "Carbohydrates" },
+      { "qty" : "1g", "of" : "Fat" },
+      { "#" : "end" }
+    ]
   },
-  "SaskoLowGiBrownBreadSlice" : {
-    "qty" : "55g",
-    "of" : "SaskoLowGiBrownBread100g"
+  {
+    "name" : "SaskoLowGiBrownBreadSlice",
+    "component" : [
+      { "qty" : "55g", "of" : "SaskoLowGiBrownBread" }
+    ]
+  },
+  {
+    "name" : "",
+    "component" : [
+      { "#" : "end" }
+    ]
   }
-}
+]

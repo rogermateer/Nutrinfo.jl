@@ -1,42 +1,47 @@
-{
-  "Water" : {
-    "Serving" : "100ml",
-    "Water" : "100ml"
+[
+  {
+    "name" : "Water",
+    "component" : [
+      { "qty" : "100ml", "per" : "100ml", "of" : "Water" }
+    ]
   },
-  "FuerteAvocado100g" : {
-    "Serving" : "100g",
-    "Energy" : "160kcal",
-    "Protein" : "2g",
-    "Carbohydrates" : "(26/3)g",
-    "Fat" : "(44/3)g"
+  {
+    "name" : "FuerteAvocado",
+    "component" : [
+      { "qty" : "240kcal", "per" : "150g", "of" : "Energy" },
+      { "qty" : "3g", "per" : "150g", "of" : "Protein" },
+      { "qty" : "13g", "per" : "150g", "of" : "Carbohydrates" },
+      { "qty" : "22g", "per" : "150g", "of" : "Fat" }
+    ]
   },
-  "FuerteAvocado" : {
-    "Serving" : "150g",
-    "Energy" : "240kcal",
-    "Protein" : "3g",
-    "Carbohydrates" : "13g",
-    "Fat" : "22g"
+  {
+    "name" : "Egg",
+    "component" : [
+      { "qty" : "143kcal", "per" : "100g", "of" : "Energy" },
+      { "qty" : "13g", "per" : "100g", "of" : "Protein" },
+      { "qty" : "1g", "per" : "100g", "of" : "Carbohydrates" },
+      { "qty" : "10g", "per" : "100g", "of" : "Fat" }
+    ]
   },
-  "Egg100g" : {
-    "Serving" : "100g",
-    "Energy" : "143kcal",
-    "Protein" : "13g",
-    "Carbohydrates" : "1g",
-    "Fat" : "10g"
+  {
+    "name" : "EggLarge",
+    "component" : [
+      { "qty" : "50g", "of" : "Egg" }
+    ]
   },
-  "EggLarge" : {
-    "qty" : "50g",
-    "of" : "Egg100g"
+  {
+    "name" : "SaskoLowGiBrownBread",
+    "component" : [
+      { "qty" : "223kcal", "per" : "100g", "of" : "Energy" },
+      { "qty" : "9g", "per" : "100g", "of" : "Protein" },
+      { "qty" : "38g", "per" : "100g", "of" : "Carbohydrates" },
+      { "qty" : "1g", "per" : "100g", "of" : "Fat" }
+    ]
   },
-  "SaskoLowGiBrownBread100g" : {
-    "Serving" : "100g",
-    "Energy" : "223kcal",
-    "Protein" : "9g",
-    "Carbohydrates" : "38g",
-    "Fat" : "1g"
-  },
-  "SaskoLowGiBrownBreadSlice" : {
-    "qty" : "55g",
-    "of" : "SaskoLowGiBrownBread100g"
+  {
+    "name" : "SaskoLowGiBrownBreadSlice",
+    "component" : [
+      { "qty" : "55g", "of" : "SaskoLowGiBrownBread" }
+    ]
   }
-}
+]
