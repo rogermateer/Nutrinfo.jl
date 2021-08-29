@@ -8,7 +8,7 @@ using Reexport
 
 function parseUnit(x)
     x=replace(x," " => "") # be liberal in what you accept
-    try 
+    try
         return eval(quote @u_str($x) end)
     catch
         m=match(r"([[][^]]+[]])(.+)",x);
@@ -18,6 +18,11 @@ function parseUnit(x)
     end
 end
 export parseUnit
+
+function stringifyUnit(x)
+    return replace(string(x), " " => "") # be conservative in what you do
+end
+export stringifyUnit
 
 # These custom units should probably be listed in a separate
 # user-specific JSON file to be defined as independent units here.
@@ -39,6 +44,7 @@ export parseUnit
 @unit meatball "meatball" meatball 1 false
 @unit piece "piece" piece 1 false
 @unit scoop "scoop" scoop 1 false
+@unit serving "serving" serving 1 false
 @unit slice "slice" slice 1 false
 @unit tablespoon "tablespoon" tablespoon 1 false
 @unit teaspoon "teaspoon" teaspoon 1 false
@@ -90,7 +96,7 @@ function Base.:(==)(s1::Component, s2::Component)
     if xor(isdefined(s1,:var"#"),isdefined(s2,:var"#")) return false end
     if isdefined(s1,:var"#") && isdefined(s2,:var"#") && ( s1.var"#" != s2.var"#" ) return false end
     # at this point, var"#" is equal because either both fields are undefined or both are defined and equal
-    
+
     if xor(isdefined(s1,:qty),isdefined(s2,:qty)) return false end
     if isdefined(s1,:qty) && isdefined(s2,:qty) && ( s1.qty != s2.qty ) return false end
     # at this point, qty is equal because either both fields are undefined or both are defined and equal
@@ -118,13 +124,15 @@ end
 export Component # added statement
 export NutrientVector # added statement
 
+# "scale" NutrientVector operation
+
 function scale(ratio::R,component::Component)::Component where {R<:Real}
     scaledComponent = deepcopy(component)
     if (isdefined(component,:qty))
-        scaledComponent.qty = replace(string(ratio * parseUnit(component.qty)), " " => "") # be conservative in what you do
+        scaledComponent.qty = stringifyUnit(ratio * parseUnit(component.qty))
     end
     if (isdefined(component,:custom))
-        scaledComponent.custom = replace(string(ratio * parseUnit(component.custom)), " " => "") # be conservative in what you do
+        scaledComponent.custom = stringifyUnit(ratio * parseUnit(component.custom))
     end
     return scaledComponent
 end
@@ -146,6 +154,63 @@ function scale(ratio::Real,ingredient::Dict{String,Any})::Dict{String,Any}
 end
 export scale
 
+# "add" Component operation
+function add(cA::Component,cB::Component)::Component # should it always return a Component? or would a NutrientVector sometimes be more appropriate?
+    if (isdefined(cA,:of) && isdefined(cB,:of) && cA.of==cB.of)
+        cAplusB = deepcopy(cA);
+        if (isdefined(cA,:qty) && isdefined(cB,:qty))
+            cAplusB.qty = stringifyUnit(parseUnit(cA.qty) + parseUnit(cB.qty));
+        end
+        return cAplusB;
+    end
+end
+
+# "add" NutrientVector operation
+
+function componentNames(nv::NutrientVector)::Array{String}
+    names = String[];
+    for component in nv.component
+        if (isdefined(component,:of))
+            push!(names,component.of)
+        end
+    end
+    return names;
+end
+export componentNames
+
+function componentsNamed(nv::NutrientVector,name::String)::Array{Component}
+    components = Component[]
+    for component in nv.component
+        if (isdefined(component,:of))
+            if (component.of==name) push!(components,component) end
+        end
+    end
+    return components;
+end
+export componentsNamed
+
+function add(nvA::NutrientVector,nvB::NutrientVector)::NutrientVector
+    nvSum = NutrientVector()
+    nvSum.name = "($(nvA.name))+($(nvB.name))"
+    nvSum.component = Component[]
+    namesA = componentNames(nvA)
+    namesB = componentNames(nvB)
+    # FIXME: deal gracefully with the cases where the number of
+    # Components returned by componentsNamed() is less than or greater
+    # than 1
+    for name in intersect(namesA,namesB)
+        push!(nvSum.component,add(componentsNamed(nvA,name)[1],componentsNamed(nvB,name)[1]))
+    end
+    for name in setdiff(namesA,namesB)
+        push!(nvSum.component,componentsNamed(nvA,name)[1])
+    end
+    for name in setdiff(namesB,namesA)
+        push!(nvSum.component,componentsNamed(nvB,name)[1])
+    end
+    push!(nvSum.component,JSON3.read("""{ "#" : "end" }""",Component)) # terminator convention
+    return nvSum
+end
+export add
 
 ###################################################################################################
 ##                                                                                               ##
