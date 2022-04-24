@@ -601,7 +601,6 @@ if ALL || "resolve" ∈ TESTS
                     { "qty":"1.75g", "of":"NutrientA" },
                     { "qty":"1.65g", "of":"NutrientB" },
                     { "qty":"0.44999999999999996g", "of":"NutrientC" },
-                    { "qty":"25.0g", "of":"serving" },
                     { "#":"end" }
                 ]
             }""", NutrientVector);

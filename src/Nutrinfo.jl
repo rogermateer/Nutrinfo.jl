@@ -51,6 +51,16 @@ export stringifyUnit
 @unit tablespoon "tablespoon" tablespoon 1 false
 @unit teaspoon "teaspoon" teaspoon 1 false
 @unit unit "unit" unit 1 false
+
+# FIXME: not sure how accurate these all are.  but this is just to
+# prevent breakage when such units are used
+@unit RE "RE" RE u"1μg" false # for Vitamin A
+@unit μgRE "μgRE" μgRE u"1μg" false # for Vitamin A
+@unit IU "IU" InternationalUnit u"0.025μg" false # for Vitamin D
+@unit TE "TE" TE u"1mg" false # for Vitamin E
+@unit mgTE "mgTE" mgTE u"1mg" false # for Vitamin E
+@unit μgTE "μgTE" μgTE u"1μg" false # for Vitamin E
+
 function __init__()
     Unitful.register(Nutrinfo)
 end
@@ -432,6 +442,7 @@ duplication.
 function _find_nv_in_db(name::String,nvDB::Vector{NutrientVector})::Vector{NutrientVector}
     return filter(nv -> nv.name==name, nvDB)
 end
+export _find_nv_in_db
 
 """
 
@@ -540,10 +551,14 @@ function resolve(nv::NutrientVector,nvDB::Vector{NutrientVector})::NutrientVecto
     for path in list_paths(g,nv.name)
         println("Path $path")
         basis = path[end]
-        if (!haskey(componentDict,basis))
-            componentDict[basis] = JSON3.read("""{"qty":"0g","of":"$basis"}""",Component)
+        if (basis=="serving")
+            continue # ignore the special case of the serving component
         end
-        componentDict[basis] = add(componentDict[basis],reduce_path(path,nvDB))
+        if (!haskey(componentDict,basis))
+            componentDict[basis] = reduce_path(path,nvDB)
+        else
+            componentDict[basis] = add(componentDict[basis],reduce_path(path,nvDB))
+        end
     end
 
     # sort the dictionary by its component names
@@ -556,7 +571,7 @@ function resolve(nv::NutrientVector,nvDB::Vector{NutrientVector})::NutrientVecto
     nvResolve.component = Component[]
 
     for (name,component) in componentDict
-        if (name=="SERVING")
+        if (name=="serving")
             continue  # ignore the special case of the serving component
         end
         println("$name=$component")
@@ -573,12 +588,12 @@ export resolve
 
 
 function stringifyNV(nv::NutrientVector)::String
-    components = join(map(JSON3.write,nv.component),",\n        ");
+    components = join(map(JSON3.write,nv.component),",\n    ");
     return replace("""{
-    "name":"$(nv.name)",
-    "component":[
-        $(components)
-    ]
+  "name":"$(nv.name)",
+  "component":[
+    $(components)
+  ]
 }""",r"\"" => "'");
 end
 export stringifyNV
