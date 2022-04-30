@@ -56,6 +56,7 @@ export stringifyUnit
 # prevent breakage when such units are used
 @unit RE "RE" RE u"1μg" false # for Vitamin A
 @unit μgRE "μgRE" μgRE u"1μg" false # for Vitamin A
+@unit mgNiacin "mgNiacin" mgNiacin u"1mg" false # for Vitamin B3
 @unit IU "IU" InternationalUnit u"0.025μg" false # for Vitamin D
 @unit TE "TE" TE u"1mg" false # for Vitamin E
 @unit mgTE "mgTE" mgTE u"1mg" false # for Vitamin E
@@ -465,7 +466,6 @@ the Components of the output of `resolve()`.
 """
 function reduce_path(path::Vector{String},nvDB::Vector{NutrientVector})::Component
     pathComponent = Component()
-    pathComponent.of = path[length(path)]
     qty = parseUnit("1")
     for j in 2:2:length(path)-2
         edgeWeight = path[j]
@@ -496,8 +496,11 @@ function reduce_path(path::Vector{String},nvDB::Vector{NutrientVector})::Compone
         # println("HELLO")
         qty = qty * parseUnit(edgeWeight) / parseUnit(vertexServing)
     end
-    finalQty = parseUnit(path[length(path)-1])
-    pathComponent.qty = stringifyUnit(qty * finalQty)
+    if (length(path) > 1)
+        pathComponent.of = path[length(path)]
+        finalQty = parseUnit(path[length(path)-1])
+        pathComponent.qty = stringifyUnit(qty * finalQty)
+    end
     return pathComponent
 end
 export reduce_path
@@ -554,10 +557,14 @@ function resolve(nv::NutrientVector,nvDB::Vector{NutrientVector})::NutrientVecto
         if (basis=="serving")
             continue # ignore the special case of the serving component
         end
-        if (!haskey(componentDict,basis))
-            componentDict[basis] = reduce_path(path,nvDB)
-        else
-            componentDict[basis] = add(componentDict[basis],reduce_path(path,nvDB))
+        path_component = reduce_path(path,nvDB)
+        println("path_component=$path_component")
+        if (path_component != Component())
+            if (!haskey(componentDict,basis))
+                componentDict[basis] = path_component
+            else
+                componentDict[basis] = add(componentDict[basis],path_component)
+            end
         end
     end
 

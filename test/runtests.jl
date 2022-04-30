@@ -402,94 +402,105 @@ end
 
 if ALL || "reduce_path" ∈ TESTS
 
-    LA=parseUnit("8g")
-    LB=parseUnit("65g")
-    LC=parseUnit("26g")
-    LD=parseUnit("42g")
-    nvLog = JSON3.read("""{
-        "name":"Log",
-        "component":[
-            { "qty":"$(stringifyUnit(LA))", "of":"Item A" },
-            { "qty":"$(stringifyUnit(LB))", "of":"Item B" },
-            { "qty":"$(stringifyUnit(LC))", "of":"Item C" },
-            { "qty":"$(stringifyUnit(LD))", "of":"Item D" },
-            { "#":"end", "of":"" }
-        ]
-    }""",NutrientVector)
+    @testset ExtendedTestSet "NutrientVector reduce_path" begin
 
-    AS=parseUnit("89g")
-    AB=parseUnit("37g")
-    AI=parseUnit("39kJ")
-    AJ=parseUnit("40g")
-    nvItemA = JSON3.read("""{
-        "name":"Item A",
-        "component":[
-            { "qty":"$(stringifyUnit(AS))", "of":"serving" },
-            { "qty":"$(stringifyUnit(AB))", "of":"Item B" },
-            { "qty":"$(stringifyUnit(AI))", "of":"Basis I" },
-            { "qty":"$(stringifyUnit(AJ))", "of":"Basis J" },
-            { "#":"end" }
-        ]
-    }""",NutrientVector)
+        nvEmpty = JSON3.read("""{
+            "name":"Empty",
+            "component":[]
+        }""",NutrientVector)
+        pathEmpty = ["Empty"]
+        @test reduce_path(pathEmpty,Vector{NutrientVector}([])) == JSON3.read("""{}""", Component)
 
-    BS=parseUnit("93g")
-    BI=parseUnit("42kJ")
-    BJ=parseUnit("43g")
-    BK=parseUnit("35g")
-    nvItemB = JSON3.read("""{
-        "name":"Item B",
-        "component":[
-            { "qty":"$(stringifyUnit(BS))", "of":"serving" },
-            { "qty":"$(stringifyUnit(BI))", "of":"Basis I" },
-            { "qty":"$(stringifyUnit(BJ))", "of":"Basis J" },
-            { "qty":"$(stringifyUnit(BK))", "of":"Basis K" },
-            { "#":"end" }
-        ]
-    }""",NutrientVector)
+        LA=parseUnit("8g")
+        LB=parseUnit("65g")
+        LC=parseUnit("26g")
+        LD=parseUnit("42g")
+        nvLog = JSON3.read("""{
+            "name":"Log",
+            "component":[
+                { "qty":"$(stringifyUnit(LA))", "of":"Item A" },
+                { "qty":"$(stringifyUnit(LB))", "of":"Item B" },
+                { "qty":"$(stringifyUnit(LC))", "of":"Item C" },
+                { "qty":"$(stringifyUnit(LD))", "of":"Item D" },
+                { "#":"end", "of":"" }
+            ]
+        }""",NutrientVector)
 
-    DS=parseUnit("56g")
-    DK=parseUnit("74g")
-    nvItemD = JSON3.read("""{
-        "name":"Item D",
-        "component":[
-            { "qty":"$(stringifyUnit(DS))", "of":"serving" },
-            { "qty":"$(stringifyUnit(DK))", "of":"Basis K" },
-            { "#":"end" }
-        ]
-    }""",NutrientVector)
-    show(nvItemD)
-    nvDB = Vector{NutrientVector}([
-        nvLog,
-        nvItemA,
-        nvItemB,
-        nvItemD,
-    ])
-    #pathLAS = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AS))", "serving"]
-    pathLABI = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AB))", "Item B", "$(stringifyUnit(BI))", "Basis I"]
-    pathLABJ = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AB))", "Item B", "$(stringifyUnit(BJ))", "Basis J"]
-    pathLABK = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AB))", "Item B", "$(stringifyUnit(BK))", "Basis K"]
-    pathLAI = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AI))", "Basis I"]
-    pathLAJ = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AJ))", "Basis J"]
-    #pathLBS = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BS))", "serving"]
-    pathLBI = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BI))", "Basis I"]
-    pathLBJ = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BJ))", "Basis J"]
-    pathLBK = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BK))", "Basis K"]
-    pathLC = ["Log", "$(stringifyUnit(LC))", "Item C"]
-    #pathLDS = ["Log", "$(stringifyUnit(LD))", "Item D", "$(stringifyUnit(DS))", "serving"]
-    pathLDK = ["Log", "$(stringifyUnit(LD))", "Item D", "$(stringifyUnit(DK))", "Basis K"]
+        AS=parseUnit("89g")
+        AB=parseUnit("37g")
+        AI=parseUnit("39kJ")
+        AJ=parseUnit("40g")
+        nvItemA = JSON3.read("""{
+            "name":"Item A",
+            "component":[
+                { "qty":"$(stringifyUnit(AS))", "of":"serving" },
+                { "qty":"$(stringifyUnit(AB))", "of":"Item B" },
+                { "qty":"$(stringifyUnit(AI))", "of":"Basis I" },
+                { "qty":"$(stringifyUnit(AJ))", "of":"Basis J" },
+                { "#":"end" }
+            ]
+        }""",NutrientVector)
 
-    @test reduce_path(pathLABI,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AB/BS * BI))", "of":"Basis I" }""",Component)
-    @test reduce_path(pathLABJ,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AB/BS * BJ))", "of":"Basis J" }""",Component)
-    @test reduce_path(pathLABK,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AB/BS * BK))", "of":"Basis K" }""",Component)
+        BS=parseUnit("93g")
+        BI=parseUnit("42kJ")
+        BJ=parseUnit("43g")
+        BK=parseUnit("35g")
+        nvItemB = JSON3.read("""{
+            "name":"Item B",
+            "component":[
+                { "qty":"$(stringifyUnit(BS))", "of":"serving" },
+                { "qty":"$(stringifyUnit(BI))", "of":"Basis I" },
+                { "qty":"$(stringifyUnit(BJ))", "of":"Basis J" },
+                { "qty":"$(stringifyUnit(BK))", "of":"Basis K" },
+                { "#":"end" }
+            ]
+        }""",NutrientVector)
 
-    @test reduce_path(pathLAI,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AI))", "of":"Basis I" }""",Component)
-    @test reduce_path(pathLAJ,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AJ))", "of":"Basis J" }""",Component)
+        DS=parseUnit("56g")
+        DK=parseUnit("74g")
+        nvItemD = JSON3.read("""{
+            "name":"Item D",
+            "component":[
+                { "qty":"$(stringifyUnit(DS))", "of":"serving" },
+                { "qty":"$(stringifyUnit(DK))", "of":"Basis K" },
+                { "#":"end" }
+            ]
+        }""",NutrientVector)
+        show(nvItemD)
+        nvDB = Vector{NutrientVector}([
+            nvLog,
+            nvItemA,
+            nvItemB,
+            nvItemD,
+        ])
+        #pathLAS = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AS))", "serving"]
+        pathLABI = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AB))", "Item B", "$(stringifyUnit(BI))", "Basis I"]
+        pathLABJ = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AB))", "Item B", "$(stringifyUnit(BJ))", "Basis J"]
+        pathLABK = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AB))", "Item B", "$(stringifyUnit(BK))", "Basis K"]
+        pathLAI = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AI))", "Basis I"]
+        pathLAJ = ["Log", "$(stringifyUnit(LA))", "Item A", "$(stringifyUnit(AJ))", "Basis J"]
+        #pathLBS = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BS))", "serving"]
+        pathLBI = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BI))", "Basis I"]
+        pathLBJ = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BJ))", "Basis J"]
+        pathLBK = ["Log", "$(stringifyUnit(LB))", "Item B", "$(stringifyUnit(BK))", "Basis K"]
+        pathLC = ["Log", "$(stringifyUnit(LC))", "Item C"]
+        #pathLDS = ["Log", "$(stringifyUnit(LD))", "Item D", "$(stringifyUnit(DS))", "serving"]
+        pathLDK = ["Log", "$(stringifyUnit(LD))", "Item D", "$(stringifyUnit(DK))", "Basis K"]
 
-    @test reduce_path(pathLBI,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LB/BS * BI))", "of":"Basis I" }""",Component)
-    @test reduce_path(pathLBJ,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LB/BS * BJ))", "of":"Basis J" }""",Component)
-    @test reduce_path(pathLBK,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LB/BS * BK))", "of":"Basis K" }""",Component)
+        @test reduce_path(pathLABI,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AB/BS * BI))", "of":"Basis I" }""",Component)
+        @test reduce_path(pathLABJ,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AB/BS * BJ))", "of":"Basis J" }""",Component)
+        @test reduce_path(pathLABK,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AB/BS * BK))", "of":"Basis K" }""",Component)
 
-    @test reduce_path(pathLDK,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LD/DS * DK))", "of":"Basis K" }""",Component)
+        @test reduce_path(pathLAI,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AI))", "of":"Basis I" }""",Component)
+        @test reduce_path(pathLAJ,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LA/AS * AJ))", "of":"Basis J" }""",Component)
+
+        @test reduce_path(pathLBI,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LB/BS * BI))", "of":"Basis I" }""",Component)
+        @test reduce_path(pathLBJ,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LB/BS * BJ))", "of":"Basis J" }""",Component)
+        @test reduce_path(pathLBK,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LB/BS * BK))", "of":"Basis K" }""",Component)
+
+        @test reduce_path(pathLDK,nvDB) == JSON3.read("""{ "qty":"$(stringifyUnit(LD/DS * DK))", "of":"Basis K" }""",Component)
+
+    end
 
 end
 
@@ -509,6 +520,18 @@ if ALL || "resolve" ∈ TESTS
     @testset ExtendedTestSet "'resolve' NutrientVector operation" begin
 
         @testset ExtendedTestSet "'resolve' pathological cases" begin
+            nvEmpty = JSON3.read("""{
+                "name":"Empty",
+                "component":[]
+            }""",NutrientVector)
+            nvResolvedEmpty = JSON3.read("""{
+                "name":"resolved(Empty)",
+                "component":[
+                    { "#":"end" }
+                ]
+            }""",NutrientVector)
+            @test stringifyNV(resolve(nvEmpty,Vector{NutrientVector}([]))) == stringifyNV(nvResolvedEmpty)
+
             nvA = JSON3.read("""{
                 "name":"A",
                 "component":[
