@@ -347,9 +347,6 @@ if ALL || "graph" ∈ TESTS
         add_vertex(g,"Log");
         @test string(collect(vertices(g)))==string([1,2,3,4,5,6,7,8])
 
-        # FIXME: what about when adding an edge?!?
-        add_edge(g,"Log","Item A","LALALAND")
-
         @test string(list_cycles(g)) == string([
         ])
         @test string(list_edges(g)) == string(Any[
@@ -584,6 +581,26 @@ if ALL || "resolve" ∈ TESTS
             @test_throws ResolveException("encountered cycles Any[['C'],['A','B']]") resolve(nvA,Vector{NutrientVector}([nvB,nvC]))
             @test_throws ResolveException("encountered cycles Any[['C'],['A','B']]") resolve(nvA,Vector{NutrientVector}([nvA,nvB,nvC]))
 
+            # quantities of duplicated entries should accumulate
+            nvD = JSON3.read("""{
+                "name":"D",
+                "component":[
+                    { "qty":"1g", "of":"Duplicated" },
+                    { "qty":"2g", "of":"Singular" },
+                    { "qty":"3g", "of":"Duplicated" },
+                    { "#":"end" }
+                ]
+            }""",NutrientVector);
+            nvResolvedD = JSON3.read("""{
+                "name":"resolved(D)",
+                "component":[
+                    { "qty":"4g", "of":"Duplicated" },
+                    { "qty":"2g", "of":"Singular" },
+                    { "#":"end" }
+                ]
+            }""",NutrientVector);
+            @test stringifyNV(resolve(nvD,Vector{NutrientVector}([]))) == stringifyNV(nvResolvedD)
+            
         end
 
         @testset ExtendedTestSet "'resolve' happy path" begin

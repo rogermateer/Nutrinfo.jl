@@ -284,12 +284,16 @@ Component.
 
 """
 function add_edge(g::MetaDiGraph,src::String,dst::String,qty::String)
-#    println("Adding edge $src -> $dst with quantity $qty")
-#    try
+    if (has_edge(g,g[src,:nv],g[dst,:nv]))
+        # get the current qty for the edge, and add it to qty
+        current_qty = get_prop(g,g[src,:nv],g[dst,:nv],:qty)
+        revised_qty = stringifyUnit(parseUnit(current_qty) + parseUnit(qty))
+        set_prop!(g,g[src,:nv],g[dst,:nv],:qty,revised_qty)
+        println("Revising edge $src -> $dst quantity from $current_qty to $current_qty + $qty = $revised_qty")
+    else
         add_edge!(g,g[src,:nv],g[dst,:nv],:qty,qty)
-#    catch
-#        println("Edge $src -> $dst (with quantity $qty?) already exists")
-#    end
+        println("Adding edge $src -> $dst with quantity $qty")
+    end
 end
 export add_edge
 
