@@ -3,9 +3,6 @@ uuid = "6a3345f1-16a6-41b5-a809-069af34afad7"
 authors = ["Roger Mateer <rogermateer@gmail.com> and contributors"]
 version = "0.1.0"
 
-[compat]
-julia = "1.7"
-
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 DeepDiffs = "ab62b9b5-e342-54a8-a765-a90f495de1a6"
@@ -20,6 +17,9 @@ StructTypes = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
+[compat]
+julia = "1.7"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
