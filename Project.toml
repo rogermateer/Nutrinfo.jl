@@ -19,6 +19,7 @@ TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
+JSON = "0.21"
 TestSetExtensions = "2"
 StructTypes = "1"
 Reexport = "1"
